@@ -18,18 +18,14 @@ def initialize_weights(input_size, hidden_size, output_size):
     return Wih, who
 
 
-def constructHiddenLayer(trainingInput):
-    weightInput, weightHidden = initialize_weights(4, 3, 1)
+def constructHiddenLayer(trainingInput, weightInput):
     HiddenLayer = Layer()
     inputs = []
-    weights = []
-    for value in trainingInput:
-        inputs.append(value)
-        weights.append(weightInput)
-    for i in range (3):
-        neuron = Neuron(inputs, weights) 
+    for i in range(3):
+        neuron = Neuron(trainingInput, weightInput)
         HiddenLayer.addNeuron(neuron)
-    return HiddenLayer, weightHidden
+    return HiddenLayer
+
 
 def feedForwardHiddenLayer(hiddenLayer):
     neurons = hiddenLayer.getNeurons()
@@ -37,3 +33,10 @@ def feedForwardHiddenLayer(hiddenLayer):
     for neuron in neurons:
         outputs.append(neuron.sigmoid())
     return outputs
+
+
+def calculateOutput(inputs, weights, prevWeights):
+    hiddenLayer = constructHiddenLayer(inputs, weights)
+    outs = feedForwardHiddenLayer(hiddenLayer)
+    output = Neuron(out, prevWeights)
+    return output.sigmoid()

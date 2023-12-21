@@ -18,3 +18,6 @@ class Neuron:
 
     def derivative(self, error):
         return error * (1 - error)
+
+    def updateWeights(weights):
+        self.weights = weights

@@ -29,7 +29,7 @@ def constructHiddenLayer(trainingInput):
     for i in range (3):
         neuron = Neuron(inputs, weights) 
         HiddenLayer.addNeuron(neuron)
-    return HiddenLayer
+    return HiddenLayer, weightHidden
 
 def feedForwardHiddenLayer(hiddenLayer):
     neurons = hiddenLayer.getNeurons()

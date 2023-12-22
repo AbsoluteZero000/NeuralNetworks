@@ -74,3 +74,6 @@ for i in range(len(trainig_inputs)):
     outputWeights = output.weights
     #TODO
     #UPDATE WEIGHTS IN HIDDEN LAYER
+    for i, neuron in enumerate(hidden_layer.get_neurons()):
+        neuron.delta = hidden_deltas[i]
+        neuron.update_weights(learning_rate)

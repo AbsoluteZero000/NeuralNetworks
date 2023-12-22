@@ -70,3 +70,6 @@ for i in range(len(trainig_inputs)):
     hidden_layer = constructHiddenLayer(trainig_inputs[i], weights)
     output = calculateOutput(hidden_layer, outputWeights)
     backpropagation(trainig_inputs[i], training_targets[i], hidden_layer, output, learning_rate)
+    outputWeights = output.weights
+    #TODO
+    #UPDATE WEIGHTS IN HIDDEN LAYER

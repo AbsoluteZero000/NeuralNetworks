@@ -1,15 +1,9 @@
-import Layer
-import pandas
 import numpy
+import pandas
 from sklearn.model_selection import train_test_split
 
-excel_file = "concrete_data.xlsx"
-df = pandas.read_excel(excel_file, header=0)
-features = df.iloc[:, :4].values
-targets = df.iloc[:, 4].values
-trainig_inputs, testing_inputs, training_targets, testing_target = train_test_split(
-    features, targets, test_size=0.25, random_state=42
-)
+import Layer
+import Neuron
 
 
 def initialize_weights(input_size, hidden_size, output_size):
@@ -57,14 +51,19 @@ def backpropagation(inputs, targets, hidden_layer, output_neuron, learning_rate)
         neuron.delta = hidden_deltas[i]
         neuron.update_weights(learning_rate)
 
+excel_file = "concrete_data.xlsx"
+df = pandas.read_excel(excel_file, header=0)
+features = df.iloc[:, :4].values
+targets = df.iloc[:, 4].values
+trainig_inputs, testing_inputs, training_targets, testing_target = train_test_split(
+    features, targets, test_size=0.25, random_state=42
+)
 
 weight, oWeights = initialize_weights(4,3,1)
-weights = []
-for i in range(4):
-    weights.append(weight)
-outputWeights = []
-for i in range(3):
-    outputWeights.append(oWeights)
+weights = [weight] * 4
+
+outputWeights = [oWeights] * 3
+
 learning_rate = 0.01
 hidden_layer = constructHiddenLayer(trainig_inputs[0], weights)
 for i in range(len(trainig_inputs)):
@@ -72,8 +71,18 @@ for i in range(len(trainig_inputs)):
     output = calculateOutput(hidden_layer, outputWeights)
     backpropagation(trainig_inputs[i], training_targets[i], hidden_layer, output, learning_rate)
     outputWeights = output.weights
-    #TODO
-    #UPDATE WEIGHTS IN HIDDEN LAYER
-    for i, neuron in enumerate(hidden_layer.get_neurons()):
-        neuron.delta = hidden_deltas[i]
-        neuron.update_weights(learning_rate)
+    
+    #     '''for i, neuron in enumerate(hidden_layer.get_neurons()):
+    #     neuron.delta = hidden_deltas[i]
+    #     neuron.update_weights(learning_rate)'''
+
+for i in range(len(testing_inputs)):
+    hidden_layer = constructHiddenLayer(testing_inputs[i], hidden_layer.getNeurons()[i].weights)
+    output = calculateOutput(hidden_layer, outputWeights)
+    print("Actual Output: ", output.sigmoid())
+    print("Target Output: ", testing_target[i])
+    print("Error: ", abs(output.sigmoid() - testing_target[i]))
+    print("Mean Square Error: ", pow(abs(output.sigmoid() - testing_target[i]), 2))
+
+
+

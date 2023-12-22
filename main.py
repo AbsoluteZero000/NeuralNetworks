@@ -35,11 +35,10 @@ def feedForwardHiddenLayer(hiddenLayer):
     return outputs
 
 
-def calculateOutput(inputs, weights, prevWeights):
-    hiddenLayer = constructHiddenLayer(inputs, weights)
+def calculateOutput(hiddenLayer, prevWeights):
     outs = feedForwardHiddenLayer(hiddenLayer)
     output = Neuron(out, prevWeights)
-    return output.sigmoid()
+    return output
 
 
 def backpropagation(inputs, targets, hidden_layer, output_neuron, learning_rate):
@@ -57,3 +56,17 @@ def backpropagation(inputs, targets, hidden_layer, output_neuron, learning_rate)
     for i, neuron in enumerate(hidden_layer.neurons):
         neuron.delta = hidden_deltas[i]
         neuron.update_weights(learning_rate)
+
+
+weight, oWeights = initialize_weights(4,3,1)
+weights = []
+for i in range(4):
+    weights.append(weight)
+outputWeights = []
+for i in range(3):
+    outputWeights.append(oWeights)
+learning_rate = 0.01
+for i in range(len(trainig_inputs)):
+    hidden_layer = constructHiddenLayer(trainig_inputs[i], weights)
+    output = calculateOutput(hidden_layer, outputWeights)
+    backpropagation(trainig_inputs[i], training_targets[i], hidden_layer, output, learning_rate)

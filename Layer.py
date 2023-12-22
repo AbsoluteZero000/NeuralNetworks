@@ -2,10 +2,15 @@ import Neuron
 
 
 class Layer:
-    neurons = []
+    def init(self):
+        self.neurons = []
 
-    def addNeuron(neuron):
-        neurons.append(neuron)
+    def add_neuron(self, neuron):
+        self.neurons.append(neuron)
+
+    def update_weights(self, learning_rate):
+        for neuron in self.neurons:
+            neuron.update_weights(learning_rate) 
 
     def getNeurons():
         return neurons

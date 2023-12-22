@@ -105,7 +105,7 @@ for i in range(len(testing_inputs)):
     print("Mean Square Error: ", pow(abs(output.sigmoid() - testing_target[i]), 2))
 
 
-
+  
 predictions = []
 for i in range(len(testing_inputs)):
     hidden_layer = constructHiddenLayer(testing_inputs[i], hidden_layer.getNeurons()[i].weights)

@@ -76,6 +76,26 @@ for i in range(len(trainig_inputs)):
     #     neuron.delta = hidden_deltas[i]
     #     neuron.update_weights(learning_rate)'''
 
+epoch = 150
+while((epoch) > 0):
+    for i in range(len(training_inputs)):
+        hidden_layer = constructHiddenLayer(training_inputs[i], hidden_layer.getNeurons()[i].weights)
+        output = calculateOutput(hidden_layer, output_weights)
+        backpropagation(training_inputs[i], training_targets[i], hidden_layer, output, learning_rate)
+        output_weights = output.weights
+    epoch -= 1
+
+for epoch in range(num_epochs):
+    for input_data, target in zip(training_inputs, training_targets):
+        hidden_layer.set_inputs(input_data)
+        output_neuron.set_inputs(feed_forward_hidden_layer(hidden_layer))
+        
+        backpropagation(hidden_layer, output_neuron, target, learning_rate)
+
+
+
+
+
 for i in range(len(testing_inputs)):
     hidden_layer = constructHiddenLayer(testing_inputs[i], hidden_layer.getNeurons()[i].weights)
     output = calculateOutput(hidden_layer, outputWeights)

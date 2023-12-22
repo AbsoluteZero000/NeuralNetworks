@@ -40,3 +40,20 @@ def calculateOutput(inputs, weights, prevWeights):
     outs = feedForwardHiddenLayer(hiddenLayer)
     output = Neuron(out, prevWeights)
     return output.sigmoid()
+
+
+def backpropagation(inputs, targets, hidden_layer, output_neuron, learning_rate):
+    # bn7sb l outputlayer delta
+    output_delta = (output_neuron.output-targets)*output_neuron.output*(1 -output_neuron.output)
+
+    # bn update l output layer weights
+    output_neuron.delta = output_delta
+    output_neuron.update_weights(learning_rate)
+
+    # n7sb l hidden layer delta
+    hidden_deltas = [neuron.weights*output_delta*neuron.output*(1-neuron.output) for neuron in hidden_layer.neurons]
+
+    # bn update l hidden layer weights
+    for i, neuron in enumerate(hidden_layer.neurons):
+        neuron.delta = hidden_deltas[i]
+        neuron.update_weights(learning_rate)

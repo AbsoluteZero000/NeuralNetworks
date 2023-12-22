@@ -66,8 +66,9 @@ outputWeights = []
 for i in range(3):
     outputWeights.append(oWeights)
 learning_rate = 0.01
+hidden_layer = constructHiddenLayer(trainig_inputs[0], weights)
 for i in range(len(trainig_inputs)):
-    hidden_layer = constructHiddenLayer(trainig_inputs[i], weights)
+    hidden_layer = constructHiddenLayer(trainig_inputs[i], hidden_layer.getNeurons()[i].weights)
     output = calculateOutput(hidden_layer, outputWeights)
     backpropagation(trainig_inputs[i], training_targets[i], hidden_layer, output, learning_rate)
     outputWeights = output.weights

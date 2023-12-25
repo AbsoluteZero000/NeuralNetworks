@@ -15,10 +15,16 @@ class Neuron:
             res += self.inputs[i] * self.weights[i]
         return res
 
-    def sigmoid(self, deriv=False):
+    def sigmoid(self, deriv=False, output=False):
         inp = self.sum_inputs()
-        if not deriv:
-            return 1 / (1 + expit(-inp))
-        return (1 / (1 + expit(-inp))) *(1 - (1 / (1 + expit(-inp))))
+        if output:
+            if deriv:
+                return 1.0
+            return inp
+        else:
+            if not deriv:
+                return expit(inp)
+            return expit(inp) * (1 - expit(inp))
+    
     def updateWeights(self, weights):
         self.weights = weights

@@ -2,7 +2,7 @@ import Neuron
 
 
 class Layer:
-    def init(self):
+    def __init__(self):
         self.neurons = []
 
     def add_neuron(self, neuron):
@@ -10,7 +10,7 @@ class Layer:
 
     def update_weights(self, learning_rate):
         for neuron in self.neurons:
-            neuron.update_weights(learning_rate) 
+            neuron.update_weights(learning_rate)
 
-    def getNeurons():
-        return neurons
+    def getNeurons(self):
+        return self.neurons

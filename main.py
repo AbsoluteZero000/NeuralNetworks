@@ -2,12 +2,12 @@ import numpy
 import pandas
 from sklearn.model_selection import train_test_split
 
-import Layer
-import Neuron
+from Neuron import Neuron
+from Layer import Layer
 
 
 def initialize_weights(input_size, hidden_size, output_size):
-    Wih = numpy.random.randn(input_size, hidden_size)
+    Wih = numpy.random.randn(input_size - 1 , hidden_size + 1)
     who = numpy.random.randn(hidden_size, output_size)
     return Wih, who
 
@@ -16,8 +16,8 @@ def constructHiddenLayer(trainingInput, weightInput):
     HiddenLayer = Layer()
     inputs = []
     for i in range(3):
-        neuron = Neuron(trainingInput, weightInput)
-        HiddenLayer.addNeuron(neuron)
+        neuron = Neuron(trainingInput, weightInput[i])
+        HiddenLayer.add_neuron(neuron)
     return HiddenLayer
 
 
@@ -31,78 +31,80 @@ def feedForwardHiddenLayer(hiddenLayer):
 
 def calculateOutput(hiddenLayer, prevWeights):
     outs = feedForwardHiddenLayer(hiddenLayer)
-    output = Neuron(out, prevWeights)
+    output = Neuron(outs, prevWeights)
     return output
 
 
-def backpropagation(inputs, targets, hidden_layer, output_neuron, learning_rate):
-    # bn7sb l outputlayer delta
-    output_delta = (output_neuron.output-targets)*output_neuron.output*(1 -output_neuron.output)
 
-    # bn update l output layer weights
-    output_neuron.delta = output_delta
-    output_neuron.update_weights(learning_rate)
+def extract():
+    excel_file = "concrete_data.xlsx"
+    df = pandas.read_excel(excel_file, header=0)
+    features = df.iloc[:, :4].values
+    targets = df.iloc[:, 4].values
+    return  train_test_split(
+    features, targets, test_size=0.25, random_state=42)
 
-    # n7sb l hidden layer delta
-    hidden_deltas = [neuron.weights*output_delta*neuron.output*(1-neuron.output) for neuron in hidden_layer.neurons]
+if __name__ == "__main__":
+    training_inputs, testing_inputs, training_targets, testing_targets = extract()
 
-    # bn update l hidden layer weights
-    for i, neuron in enumerate(hidden_layer.neurons):
-        neuron.delta = hidden_deltas[i]
-        neuron.update_weights(learning_rate)
+    input_weights, oWeights = initialize_weights(4,3,1)
+    # print(training_inputs)
+    # print(oWeights)
 
-excel_file = "concrete_data.xlsx"
-df = pandas.read_excel(excel_file, header=0)
-features = df.iloc[:, :4].values
-targets = df.iloc[:, 4].values
-trainig_inputs, testing_inputs, training_targets, testing_target = train_test_split(
-    features, targets, test_size=0.25, random_state=42
-)
+    learning_rate = 1
+    epocs = 100
+    output_weights = [item for sublist in oWeights for item in sublist]
+    # print(weight)
+    stop = False
+    while epocs > 0:
+        for i in range(len(training_inputs)):
+            hidden_layer = constructHiddenLayer(training_inputs[i], input_weights)
+            output = calculateOutput(hidden_layer, output_weights)
+            predicted_value = output.sigmoid()
+            mean_square_error = (1/2) * pow((training_targets[i] - predicted_value), 2)
+            error = (predicted_value * (1 - predicted_value) * (training_targets[i] - predicted_value))
+            weights = []
+            j = 0
+            for weight in output.weights:
+                weights.append(weight + learning_rate * (error * output.inputs[j]))
+                j += 1
+            output.updateWeights(weights)
+            input_weights = []
+            hidden_layer_neurons = hidden_layer.getNeurons()
+            for neuron in hidden_layer_neurons:
+                inputweights = []
+                j = 0
+                for weight in neuron.weights:
+                    error_input = (neuron.sigmoid() * (1 - neuron.sigmoid()) * error * (weight))
+                    inputweights.append(weight + learning_rate * (error_input * neuron.inputs[j]))
+                    j += 1
+                neuron.updateWeights(inputweights)
+                input_weights.append(inputweights)
+            output_weights = output.weights
+        if stop:
+            break
+        epocs -=1
 
-weight, oWeights = initialize_weights(4,3,1)
-weights = [weight] * 4
-
-outputWeights = [oWeights] * 3
-
-learning_rate = 0.01
-hidden_layer = constructHiddenLayer(trainig_inputs[0], weights)
-for i in range(len(trainig_inputs)):
-    hidden_layer = constructHiddenLayer(trainig_inputs[i], hidden_layer.getNeurons()[i].weights)
-    output = calculateOutput(hidden_layer, outputWeights)
-    backpropagation(trainig_inputs[i], training_targets[i], hidden_layer, output, learning_rate)
-    outputWeights = output.weights
-    
-    #     '''for i, neuron in enumerate(hidden_layer.get_neurons()):
-    #     neuron.delta = hidden_deltas[i]
-    #     neuron.update_weights(learning_rate)'''
-
-epoch = 150
-while((epoch) > 0):
-    for i in range(len(training_inputs)):
-        hidden_layer = constructHiddenLayer(training_inputs[i], hidden_layer.getNeurons()[i].weights)
+    print("Testing phase starts")
+    for i in range(len(testing_inputs)):
+        hidden_layer = constructHiddenLayer(testing_inputs[i], input_weights)
         output = calculateOutput(hidden_layer, output_weights)
-        backpropagation(training_inputs[i], training_targets[i], hidden_layer, output, learning_rate)
-        output_weights = output.weights
-    epoch -= 1
+        predicted_value = output.sigmoid()
+        mean_square_error = (1/2) * pow((testing_targets[i] - predicted_value), 2)
+        error = (predicted_value * (1 - predicted_value) * (testing_targets[i] - predicted_value))
+        print("Predicted Value = ", predicted_value)
+        print("Acual Value = ", testing_targets[i])
+        print("Error = ", error)
+        print("Mean Square Error = ", mean_square_error)
 
-for epoch in range(num_epochs):
-    for input_data, target in zip(training_inputs, training_targets):
-        hidden_layer.set_inputs(input_data)
-        output_neuron.set_inputs(feed_forward_hidden_layer(hidden_layer))
-        
-        backpropagation(hidden_layer, output_neuron, target, learning_rate)
-
-
-
-
-
-for i in range(len(testing_inputs)):
-    hidden_layer = constructHiddenLayer(testing_inputs[i], hidden_layer.getNeurons()[i].weights)
-    output = calculateOutput(hidden_layer, outputWeights)
-    print("Actual Output: ", output.sigmoid())
-    print("Target Output: ", testing_target[i])
-    print("Error: ", abs(output.sigmoid() - testing_target[i]))
-    print("Mean Square Error: ", pow(abs(output.sigmoid() - testing_target[i]), 2))
-
-
-
+    choice = input("Enter 1 if you want to enter data, anything else if you want to exit: ")
+    if choice == '1':
+        inputs = []
+        for i in range (4):
+            inp = float(input("Enter the input value"))
+            inputs.append(inp)
+        hidden_layer = constructHiddenLayer(inputs, input_weights)
+        output = calculateOutput(hidden_layer, output_weights)
+        predicted_value = output.sigmoid()
+        print("Predicted Value = ", predicted_value)
+        print("Acual Value = ", testing_targets[i])
